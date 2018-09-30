@@ -17,12 +17,9 @@ class Controller:
         for service in dm_robot.services.find(template_name='s3'):
             self.s3[service.name] = S3Manager(self, service.name)
 
-    def deploy_n(self, n, farm, size=20000, data=4, parity=2, login='admin', password='adminadmin'):
-        start = len(self.s3)
-        for i in range(start, start+n):
-            name = 's3_controller_%d' % i
-            self.s3[name] = S3Manager(self, name)
-            self.s3[name].deploy(farm, size=size, data=data, parity=parity, login=login, password=password)
+    def deploy(self, name, farm, size=20000, data=4, parity=2, login='admin', password='adminadmin'):
+        self.s3[name] = S3Manager(self, name)
+        self.s3[name].deploy(farm, size=size, data=data, parity=parity, login=login, password=password)
 
     def urls(self):
         return {name: url for name, url in self._do_on_all(lambda s3: (s3.name, s3.url))}

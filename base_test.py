@@ -25,17 +25,17 @@ class BaseTest(TestCase):
         cls.s3_controller = Controller(config)
 
         if config['s3']['deploy']:
-            s3_service_name = str(uuid4()).replace('-', '')[:10]
+            s3_service_name = str(time.time()).split('.')[0]
             logger.info("- s3 service name : {}".format(s3_service_name))
-            s3_instance = cls.s3_controller.deploy_n(1, config['s3']['instance']['farm'],
-                                                     config['s3']['instance']['size'],
-                                                     config['s3']['instance']['shards'],
-                                                     config['s3']['instance']['parity'],
-                                                     config['s3']['instance']['shard_size'])
+
+            cls.s3_controller.deploy(s3_service_name, config['s3']['instance']['farm'],
+                                     config['s3']['instance']['size'],
+                                     config['s3']['instance']['shards'],
+                                     config['s3']['instance']['parity'],
+                                     config['s3']['instance']['shard_size'])
             logger.info("- wait for deploying {} s3 service".format(s3_service_name))
-            s3_instance.wait(die=True)
+            cls.s3 = cls.s3_controller.s3[s3_service_name].wait(die=True)
             while True:
-                cls.s3 = cls.s3_controller.s3[s3_service_name]
                 state = cls.s3.service.state
                 logger.info(" s3 state : {}".format(state))
 
