@@ -5,7 +5,7 @@ monkey.patch_all()
 import click
 from gevent.pool import Group
 from jumpscale import j
-from s3 import S3Manager
+from utilz.s3 import S3Manager
 
 
 class Controller:
