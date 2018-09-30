@@ -24,11 +24,11 @@ class BaseTest(TestCase):
         config = j.data.serializer.yaml.load('./config.yaml')
         cls.s3_controller = Controller(config)
 
-        if config['s3']['deploy']:
+        if config['s3']['instance']['deploy']:
             s3_service_name = str(uuid4()).replace('-', '')[:10]
             logger.info(" [*] s3 service name : {}".format(s3_service_name))
-            cls.s3_controller.deploy_n(1, config['s3']['farm'], config['s3']['size'], config['s3']['shards'],
-                                          config['s3']['parity'], config['s3']['shard_size'])
+            cls.s3_controller.deploy_n(1, config['s3']['instance']['farm'], config['s3']['instance']['size'], config['s3']['instance']['shards'],
+                                          config['s3']['instance']['parity'], config['s3']['instance']['shard_size'])
 
             while True:
                 cls.s3 = cls.s3_controller.s3[s3_service_name]
@@ -42,7 +42,7 @@ class BaseTest(TestCase):
                     logger.info(" [*] Hope s3 is working! ")
                     break
         else:
-            s3_service_name = config['s3']['s3_service_name']
+            s3_service_name = config['s3']['instance']['s3_service_name']
             if s3_service_name not in cls.s3_controller.s3:
                 logger.error(" [*] cant find {} s3 service under {} robot client".format(s3_service_name,
                                                                                          config['robot']['client']))
