@@ -13,6 +13,7 @@ class BaseTest(TestCase):
         self.config = j.data.serializer.yaml.load('./config.yaml')
         self.logger = logger
 
+    @classmethod
     def setUpClass(cls):
         """
         Deploy s3.
@@ -46,7 +47,7 @@ class BaseTest(TestCase):
                                                                                          config['robot']['client']))
                 raise Exception(" [*] cant find {} s3 service under {} robot client".format(s3_service_name,
                                                                                             config['robot']['client']))
-
+    @classmethod
     def tearDownClass(cls):
         """
         TearDown s3 instance
