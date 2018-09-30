@@ -3,57 +3,54 @@ from gevent import monkey
 monkey.patch_all()
 
 import click
-from failures import FailureGenenator
 from gevent.pool import Group
 from jumpscale import j
-from monitoring import Monitoring
-from perf import Perf
 from s3 import S3Manager
-from reset import EnvironmentReset
 
 
 class Controller:
-    def __init__(self, config, name):
+    def __init__(self, config):
         self.config = config
-        self.s3 = S3Manager(self, name)
-        self.monitoring = Monitoring(self)
-        self.failures = FailureGenenator(self)
-        self.perf = Perf(self)
-        self.reset = EnvironmentReset(self)
+        j.clients.zrobot.get(self.config['robot']['client'], data={'url': config['robot']['url']})
+        dm_robot = j.clients.zrobot.robots['controller']
+        self.s3 = {}
+        for service in dm_robot.services.find(template_name='s3'):
+            self.s3[service.name] = S3Manager(self, service.name)
 
-    def execute_all_nodes(self, func, nodes=None):
-        """
-        execute func on all the nodes
+    def deploy_n(self, n, farm, size=20000, data=4, parity=2, login='admin', password='adminadmin'):
+        start = len(self.s3)
+        for i in range(start, start+n):
+            name = 's3_controller_%d' % i
+            self.s3[name] = S3Manager(self, name)
+            self.s3[name].deploy(farm, size=size, data=data, parity=parity, login=login, password=password)
 
-        if nodes is None, func is execute on all the nodes that play a role with the minio
-        deployement, if nodes is not None, it needs to be an iterable containing a node object
+    def urls(self):
+        return {name: url for name, url in self._do_on_all(lambda s3: (s3.name, s3.url))}
 
-        :param func: function to execute, func needs to accept one argument, a node object
-        :type func: function
-        :param nodes: list of node on whic to execute func, defaults to None
-        :param nodes: iterable, optional
-        """
+    def minio_config(self):
+        return {name: config for name, config in self._do_on_all(lambda s3: (s3.name, s3.minio_config))}
 
-        if nodes is None:
-            nodes = set([self.s3.vm_node, self.s3.vm_host])
-            nodes.update(self.s3.zerodb_nodes)
+    def states(self):
+        return {name: config for name, config in self._do_on_all(lambda s3: (s3.name, s3.service.state))}
 
-        g = Group()
-        g.map(func, nodes)
-        g.join()
+    def _do_on_all(self, func):
+        group = Group()
+        return group.imap_unordered(func, self.s3.values())
 
 
 def read_config(path):
-
+    config = j.data.serializer.yaml.load(path)
     return config
 
 
 @click.command()
-@click.option('--config', help='path to config file', default='demo.yaml')
-@click.option('--name', help='name of the s3 service', required=True)
-def main(config, name):
-    demo = Demo(read_config('demo.yaml'), name)
+@click.option('--config', help='path to config file', default='controller.yaml')
+def main(config):
+    controller = controller(read_config('controller.yaml'))
     from IPython import embed
     embed()
 
 
+# self.client.bash('test -b /dev/{0} && dd if=/dev/zero bs=1M count=500 of=/dev/{0}'.format(diskpath)).get()
+if __name__ == '__main__':
+    main()

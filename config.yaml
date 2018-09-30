@@ -1,9 +1,20 @@
 zerotier:
-  id: 'af78bf9436630e43'
-  token: 'MyuDhfUYxCkc8eCH8cA4bt4WMgR6saWT'
+  id: af78bf9436630e43
+  token: MyuDhfUYxCkc8eCH8cA4bt4WMgR6saWT
 
 robot:
-  url: 'http://localhost:6600'
+  url: http://localhost:6600
+  client: demo
 
-farmer:
-  name: 'tlre'
+s3:
+  deploy: false # True > deploy, false > use
+  instance:
+    farm: 'tlre'
+    size: 10000
+    shards: 10
+    parity: 4
+    shard_size: 2000
+  Use:
+    s3_service_name: '' # use this s3 service under the robot
+
+
