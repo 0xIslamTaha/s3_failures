@@ -24,7 +24,7 @@ class BaseTest(TestCase):
         config = j.data.serializer.yaml.load('./config.yaml')
         cls.s3_controller = Controller(config)
 
-        if config['s3']['instance']['deploy']:
+        if config['s3']['deploy']:
             s3_service_name = str(uuid4()).replace('-', '')[:10]
             logger.info(" [*] s3 service name : {}".format(s3_service_name))
             cls.s3_controller.deploy_n(1, config['s3']['instance']['farm'], config['s3']['instance']['size'], config['s3']['instance']['shards'],
