@@ -12,7 +12,7 @@ class Controller:
     def __init__(self, config):
         self.config = config
         j.clients.zrobot.get(self.config['robot']['client'], data={'url': config['robot']['url']})
-        dm_robot = j.clients.zrobot.robots['controller']
+        dm_robot = j.clients.zrobot.robots[self.config['robot']['client']]
         self.s3 = {}
         for service in dm_robot.services.find(template_name='s3'):
             self.s3[service.name] = S3Manager(self, service.name)
@@ -42,15 +42,3 @@ def read_config(path):
     config = j.data.serializer.yaml.load(path)
     return config
 
-
-@click.command()
-@click.option('--config', help='path to config file', default='controller.yaml')
-def main(config):
-    controller = controller(read_config('controller.yaml'))
-    from IPython import embed
-    embed()
-
-
-# self.client.bash('test -b /dev/{0} && dd if=/dev/zero bs=1M count=500 of=/dev/{0}'.format(diskpath)).get()
-if __name__ == '__main__':
-    main()

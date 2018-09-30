@@ -27,11 +27,12 @@ class BaseTest(TestCase):
         if config['s3']['deploy']:
             s3_service_name = str(uuid4()).replace('-', '')[:10]
             logger.info(" [*] s3 service name : {}".format(s3_service_name))
-            cls.s3_controller.s3.deploy_n(1, config['s3']['farm'], config['s3']['size'], config['s3']['shards'],
+            cls.s3_controller.deploy_n(1, config['s3']['farm'], config['s3']['size'], config['s3']['shards'],
                                           config['s3']['parity'], config['s3']['shard_size'])
 
             while True:
-                state = cls.s3_controller.s3.service.state
+                cls.s3 = cls.s3_controller.s3[s3_service_name]
+                state = cls.s3.service.state
                 logger.info(" s3 state : {}".format(state))
 
                 if not state:  # TODO
