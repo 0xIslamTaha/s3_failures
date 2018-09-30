@@ -34,7 +34,9 @@ class BaseTest(TestCase):
                                      config['s3']['instance']['parity'],
                                      config['s3']['instance']['shard_size'])
             logger.info("- wait for deploying {} s3 service".format(s3_service_name))
-            cls.s3 = cls.s3_controller.s3[s3_service_name].wait(die=True)
+            import ipdb; ipdb.set_trace()
+            cls.s3 = cls.s3_controller.s3[s3_service_name]
+            cls.s3.wait(die=True)
             while True:
                 state = cls.s3.service.state
                 logger.info(" s3 state : {}".format(state))
