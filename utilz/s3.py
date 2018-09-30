@@ -3,10 +3,10 @@ from zerorobot.service_collection import ServiceNotFoundError
 
 from gevent.pool import Group
 
-from monitoring import Monitoring
-from perf import Perf
-from reset import EnvironmentReset
-from failures import FailureGenenator
+from utilz.monitoring import Monitoring
+from utilz.perf import Perf
+from utilz.reset import EnvironmentReset
+from utilz.failures import FailureGenenator
 
 logger = j.logger.get('s3demo')
 
