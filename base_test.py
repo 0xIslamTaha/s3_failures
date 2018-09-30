@@ -26,14 +26,14 @@ class BaseTest(TestCase):
 
         if config['s3']['deploy']:
             s3_service_name = str(time.time()).split('.')[0]
-            logger.info("- s3 service name : {}".format(s3_service_name))
+            logger.info("s3 service name : {}".format(s3_service_name))
 
             instance = cls.s3_controller.deploy(s3_service_name, config['s3']['instance']['farm'],
                                                 config['s3']['instance']['size'],
                                                 config['s3']['instance']['shards'],
                                                 config['s3']['instance']['parity'],
                                                 config['s3']['instance']['shard_size'])
-            logger.info("- wait for deploying {} s3 service".format(s3_service_name))
+            logger.info("wait for deploying {} s3 service".format(s3_service_name))
             import ipdb;
             ipdb.set_trace()
             instance.wait(die=True)
@@ -41,19 +41,19 @@ class BaseTest(TestCase):
                 cls.s3 = cls.s3_controller.s3[s3_service_name]
                 state = cls.s3.service.state
                 logger.info(" s3 state : {}".format(state))
-
-                if not state:  # TODO need to check state value
-                    time.sleep(5 * 60)
-                    logger.info("- wait for 5 mins")
-                else:
-                    logger.info("- Hope s3 is working! ")
+                try:
+                    state.check('actions', 'install', 'ok')
+                    logger.info("Hope s3 is working! ")
                     break
+                except:
+                    time.sleep(5 * 60)
+                    logger.info("wait for 5 mins")
         else:
             s3_service_name = config['s3']['instance']['s3_service_name']
             if s3_service_name not in cls.s3_controller.s3:
-                logger.error("- cant find {} s3 service under {} robot client".format(s3_service_name,
+                logger.error("cant find {} s3 service under {} robot client".format(s3_service_name,
                                                                                       config['robot']['client']))
-                raise Exception("- cant find {} s3 service under {} robot client".format(s3_service_name,
+                raise Exception("cant find {} s3 service under {} robot client".format(s3_service_name,
                                                                                          config['robot']['client']))
 
     @classmethod
@@ -63,5 +63,5 @@ class BaseTest(TestCase):
 
         :return:
         """
-        logger.info("- Delete s3 instance")
+        logger.info("Delete s3 instance")
         cls.s3_controller.s3.remove()
