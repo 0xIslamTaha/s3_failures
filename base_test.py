@@ -61,6 +61,6 @@ class BaseTest(TestCase):
 
         :return:
         """
-        logger.info("Delete s3 instance")
         if not cls.s3_service_name:
+            logger.info("Delete s3 instance")
             cls.s3_controller.s3.remove()

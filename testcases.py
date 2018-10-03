@@ -9,6 +9,7 @@ class TestS3Failures(BaseTest):
 
         :return:
         """
+        import ipdb; ipdb.set_trace()
         no_of_zdb = randint(1, self.parity)
         self.logger.info(' [*] Stop {} zdb'.format(no_of_zdb))
         self.s3_controller.failures.zdb_down(count=no_of_zdb)

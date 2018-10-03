@@ -1,10 +1,10 @@
+robot:
+  url: http://localhost:6600
+  client: demo
+
 zerotier:
   id: af78bf9436630e43
   token: MyuDhfUYxCkc8eCH8cA4bt4WMgR6saWT
-
-robot:
-  url: http://localhost:6600
-  client: controller
 
 s3:
   deploy: false # True > deploy, false > use
