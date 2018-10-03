@@ -7,14 +7,14 @@ robot:
   client: controller
 
 s3:
-  deploy: true # True > deploy, false > use
+  deploy: false # True > deploy, false > use
   instance:
     farm: 'tlre'
     size: 10000
     shards: 10
     parity: 4
     shard_size: 2000
-  Use:
-    s3_service_name: '' # use this s3 service under the robot
+  use:
+    s3_service_name: 's3_demo_0' # use this s3 service under the robot
 
 

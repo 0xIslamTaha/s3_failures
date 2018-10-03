@@ -47,7 +47,7 @@ class BaseTest(TestCase):
                     time.sleep(5 * 60)
                     logger.info("wait for 5 mins")
         else:
-            cls.s3_service_name = config['s3']['instance']['s3_service_name']
+            cls.s3_service_name = config['s3']['use']['s3_service_name']
             if cls.s3_service_name not in cls.s3_controller.s3:
                 logger.error("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
                                                                                     config['robot']['client']))
