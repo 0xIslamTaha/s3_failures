@@ -104,13 +104,13 @@ class BaseTest(TestCase):
         if err:
             self.logger.error(err)
 
-        self.logger.info('create TestingBucket bucket')
-        creat_bucket_cmd = '/bin/mc mb s3Minio/{}'.format('TestingBucket')
-        self.execute_cmd(cmd=creat_bucket_cmd)
+        self.logger.info('create testingbucket bucket')
+        creat_bucket_cmd = '/bin/mc mb s3Minio/{}'.format('testingbucket')
+        out, err = self.execute_cmd(cmd=creat_bucket_cmd)
         if err:
             self.logger.error(err)
 
-        upload_cmd = '/bin/mc cp {} s3Minio/TestingBucket/{}'.format(self.file_name, self.file_name)
+        upload_cmd = '/bin/mc cp {} s3Minio/testingbucket/{}'.format(self.file_name, self.file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
         if err:
             self.logger.error(err)
@@ -123,7 +123,7 @@ class BaseTest(TestCase):
          - return its md5 checksum hash
         :return: str(downloaded_file_md5)
         """
-        upload_cmd = '/bin/mc cp s3Minio/TestingBucket/{} {}_out'.format(file_name, file_name)
+        upload_cmd = '/bin/mc cp s3Minio/testingbucket/{} {}_out'.format(file_name, file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
         self.logger.info(out)
         self.logger.err(err)
