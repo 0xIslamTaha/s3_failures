@@ -5,7 +5,7 @@ from base_test import BaseTest
 class TestS3Failures(BaseTest):
     def test001_stop_parity_zdb(self):
         """
-        Stop n zdp, n <= parity. S3 shoule still working fine.
+        Stop n zdp, n <= parity. S3 should still working fine.
 
         :return:
         """

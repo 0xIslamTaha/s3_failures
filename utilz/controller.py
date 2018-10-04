@@ -9,9 +9,13 @@ from utilz.s3 import S3Manager
 
 
 class Controller:
-    def __init__(self, config):
+    def __init__(self, config, god_token=None):
         self.config = config
-        j.clients.zrobot.get(self.config['robot']['client'], data={'url': config['robot']['url']})
+        if god_token:
+            j.clients.zrobot.get(self.config['robot']['client'], data={'url': config['robot']['url'],
+                                                                       'god_token_': god_token})
+        else:
+            j.clients.zrobot.get(self.config['robot']['client'], data={'url': config['robot']['url']})
         dm_robot = j.clients.zrobot.robots[self.config['robot']['client']]
         self.s3 = {}
         for service in dm_robot.services.find(template_name='s3'):

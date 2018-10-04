@@ -2,6 +2,7 @@ from unittest import TestCase
 from utilz.controller import Controller
 from uuid import uuid4
 from jumpscale import j
+from subprocess import Popen, PIPE
 import time
 
 logger = j.logger.get('s3_failures')
@@ -22,9 +23,8 @@ class BaseTest(TestCase):
 
         """
         config = j.data.serializer.yaml.load('./config.yaml')
-        cls.s3_controller = Controller(config)
-
         if config['s3']['deploy']:
+            cls.s3_controller = Controller(config)
             s3_service_name = str(time.time()).split('.')[0]
             logger.info("s3 service name : {}".format(s3_service_name))
 
@@ -47,6 +47,10 @@ class BaseTest(TestCase):
                     time.sleep(5 * 60)
                     logger.info("wait for 5 mins")
         else:
+            sub = Popen('zrobot godtoken get', stdout=PIPE, stderr=PIPE, shell=True)
+            out, err = sub.communicate()
+            god_token = str(out).split(' ')[2]
+            cls.s3_controller = Controller(config, god_token)
             cls.s3_service_name = config['s3']['use']['s3_service_name']
             if cls.s3_service_name not in cls.s3_controller.s3:
                 logger.error("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
