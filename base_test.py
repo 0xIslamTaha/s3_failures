@@ -61,6 +61,7 @@ class BaseTest(TestCase):
                                                                                     config['robot']['client']))
                 raise Exception("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
                                                                                 config['robot']['client']))
+        cls.s3 = cls.s3_controller.s3[cls.s3_service_name]
         self.get_s3_info()
         cls.file_name = self.upload_file()
 
