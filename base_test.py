@@ -108,7 +108,7 @@ class BaseTest(TestCase):
         upload_cmd = '/bin/mc cp {} s3Minio/TestingBucket/{}'.format(self.file_name, self.file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
         self.logger.info(out)
-        self.logger.err(err)
+        self.logger.error(err)
 
         return self.file_name
 
