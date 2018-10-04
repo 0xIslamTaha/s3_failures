@@ -13,7 +13,7 @@ class TestS3Failures(BaseTest):
         import ipdb; ipdb.set_trace()
         self.logger.info(' [*] Stop {} zdb'.format((self.parity)))
         md5_before = self.file_name
-        self.s3_controller.failures.zdb_down(count=self.parity)
+        self.s3.failures.zdb_down(count=self.parity)
 
         # input, output = self.s3_controller.perf.simple_write_read()
         # self.assertEqual(input, output.read(), ' [*] downloaded file != uploaded file')

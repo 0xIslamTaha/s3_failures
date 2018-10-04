@@ -82,20 +82,19 @@ class BaseTest(TestCase):
 
     def upload_file(self):
         """
-         - Create random 10M file
+         - Create random 2M file
          - Calc its md5 checksum hash
          - Rename file to make its name = md5
          - Upload it
         :return: file_name
         """
         with open('%s' % 'random', 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024 * 10))  # 1
+            fout.write(os.urandom(1024 * 1024 * 2))  # 1
 
         self.file_name = self.calc_md5_checksum('random')
 
         os.rename('random', self.file_name)
 
-        import ipdb; ipdb.set_trace()
         self.logger.info('config s3Minio')
         config_minio_cmd = '/bin/mc config host add s3Minio {} {} {}'.format(self.minio['minio_ip'],
                                                                              self.minio['username'],
@@ -123,10 +122,11 @@ class BaseTest(TestCase):
          - return its md5 checksum hash
         :return: str(downloaded_file_md5)
         """
+        self.logger.info('downloading {} .... '.format(file_name))
         upload_cmd = '/bin/mc cp s3Minio/testingbucket/{} {}_out'.format(file_name, file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
-        self.logger.info(out)
-        self.logger.err(err)
+        if err:
+            self.logger.error(err)
         return self.calc_md5_checksum('{}_out'.format(file_name))
 
     def get_s3_info(self):
