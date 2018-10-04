@@ -3,12 +3,15 @@ from utilz.controller import Controller
 from uuid import uuid4
 from jumpscale import j
 from subprocess import Popen, PIPE
-import time
+from minio import Minio
+import time, os, hashlib
 
 logger = j.logger.get('s3_failures')
 
 
 class BaseTest(TestCase):
+    file_name = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = j.data.serializer.yaml.load('./config.yaml')
@@ -22,6 +25,7 @@ class BaseTest(TestCase):
         function to deploy s3 with one of pre-configured parameters.
 
         """
+        self = cls()
         config = j.data.serializer.yaml.load('./config.yaml')
         if config['s3']['deploy']:
             cls.s3_controller = Controller(config)
@@ -56,15 +60,87 @@ class BaseTest(TestCase):
                 logger.error("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
                                                                                     config['robot']['client']))
                 raise Exception("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
-                                                                                       config['robot']['client']))
+                                                                                config['robot']['client']))
+
+        cls.file_name = self.upload_file()
 
     @classmethod
     def tearDownClass(cls):
         """
-        TearDown s3 instance
+        TearDown
 
         :return:
         """
         if not cls.s3_service_name:
             logger.info("Delete s3 instance")
             cls.s3_controller.s3.remove()
+
+    def setUp(self):
+        self.s3 = self.s3_controller.s3[self.s3_service_name]
+        self.get_s3_info()
+
+    def upload_file(self):
+        """
+         - Create random 10M file
+         - Calc its md5 checksum hash
+         - Rename file to make its name = md5
+         - Upload it
+        :return: file_name
+        """
+        with open('%s' % 'random', 'wb') as fout:
+            fout.write(os.urandom(1024 * 1024 * 10))  # 1
+
+        self.file_name = self.calc_md5_checksum('random')
+
+        os.rename('random', self.file_name)
+
+        config_minio_cmd = '/bin/mc config host add s3Minio {} {} {}'.format(self.minio['minio_ip'],
+                                                                             self.minio['username'],
+                                                                             self.minio['password'])
+        out, err = self.execute_cmd(cmd=config_minio_cmd)
+        if err:
+            raise Exception
+
+        creat_bucket_cmd = '/bin/mc mb s3Minio/{}'.format('TestingBucket')
+        self.execute_cmd(cmd=creat_bucket_cmd)
+
+        upload_cmd = '/bin/mc cp {} s3Minio/TestingBucket/{}'.format(self.file_name, self.file_name)
+        out, err = self.execute_cmd(cmd=upload_cmd)
+        if err:
+            raise Exception
+
+        return self.file_name
+
+    def download_file(self, file_name):
+        """
+         - downlaod file
+         - return its md5 checksum hash
+        :return: str(downloaded_file_md5)
+        """
+        upload_cmd = '/bin/mc cp s3Minio/TestingBucket/{} {}_out'.format(file_name, file_name)
+        out, err = self.execute_cmd(cmd=upload_cmd)
+        if err:
+            raise Exception
+        return self.calc_md5_checksum('{}_out'.format(file_name))
+
+    def get_s3_info(self):
+        self.s3_data = self.s3.service.data['data']
+        self.parity = self.s3_data['parityShards']
+        self.shards = self.s3_data['dataShards']
+
+        self.minio = {'minio_ip': self.s3_data['minioUrls']['public'],
+                      'username': self.s3_data['minioLogin'],
+                      'password': self.s3_data['minioPassword']
+                      }
+
+    def execute_cmd(self, cmd):
+        sub = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+        out, err = sub.communicate()
+        return out, err
+
+    def calc_md5_checksum(self, file_path):
+        hash_md5 = hashlib.md5()
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
