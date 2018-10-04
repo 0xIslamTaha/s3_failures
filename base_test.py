@@ -107,8 +107,8 @@ class BaseTest(TestCase):
 
         upload_cmd = '/bin/mc cp {} s3Minio/TestingBucket/{}'.format(self.file_name, self.file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
-        if err:
-            raise Exception
+        self.logger.info(out)
+        self.logger.err(err)
 
         return self.file_name
 
@@ -120,8 +120,8 @@ class BaseTest(TestCase):
         """
         upload_cmd = '/bin/mc cp s3Minio/TestingBucket/{} {}_out'.format(file_name, file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
-        if err:
-            raise Exception
+        self.logger.info(out)
+        self.logger.err(err)
         return self.calc_md5_checksum('{}_out'.format(file_name))
 
     def get_s3_info(self):
