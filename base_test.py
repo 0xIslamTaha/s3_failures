@@ -95,21 +95,25 @@ class BaseTest(TestCase):
 
         os.rename('random', self.file_name)
 
+        import ipdb; ipdb.set_trace()
         self.logger.info('config s3Minio')
         config_minio_cmd = '/bin/mc config host add s3Minio {} {} {}'.format(self.minio['minio_ip'],
                                                                              self.minio['username'],
                                                                              self.minio['password'])
         out, err = self.execute_cmd(cmd=config_minio_cmd)
-        self.logger.error(err)
+        if err:
+            self.logger.error(err)
 
         self.logger.info('create TestingBucket bucket')
         creat_bucket_cmd = '/bin/mc mb s3Minio/{}'.format('TestingBucket')
         self.execute_cmd(cmd=creat_bucket_cmd)
-        self.logger.error(err)
+        if err:
+            self.logger.error(err)
 
         upload_cmd = '/bin/mc cp {} s3Minio/TestingBucket/{}'.format(self.file_name, self.file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
-        self.logger.error(err)
+        if err:
+            self.logger.error(err)
 
         return self.file_name
 
