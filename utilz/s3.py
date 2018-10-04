@@ -12,7 +12,6 @@ logger = j.logger.get('s3demo')
 
 
 class S3Manager:
-
     def __init__(self, parent, name):
         self.monitoring = Monitoring(self)
         self.failures = FailureGenenator(self)
