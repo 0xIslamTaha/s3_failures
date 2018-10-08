@@ -34,7 +34,7 @@ class BaseTest(TestCase):
 
             data = [cls.config['s3']['instance']['farm'], cls.config['s3']['instance']['size'],
                     cls.config['s3']['instance']['shards'], cls.config['s3']['instance']['parity']]
-            instance = cls.s3_controller.deploy(s3_service_name, *data)
+            #instance = cls.s3_controller.deploy(s3_service_name, *data)
             logger.info("wait for deploying {} s3 service".format(s3_service_name))
             # instance.wait(die=True)
             for _ in range(50):
