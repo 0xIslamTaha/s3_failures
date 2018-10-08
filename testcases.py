@@ -74,7 +74,6 @@ class TestS3Failures(BaseTest):
         self.logger.info(' Stop {} zdb'.format(zdb_turn_down))
         self.s3.failures.zdb_down(count=zdb_turn_down)
 
-        import ipdb; ipdb.set_trace()
         try:
             self.file_name = self.upload_file()
             self.assertTrue(False, 'Uploading should raise an error')

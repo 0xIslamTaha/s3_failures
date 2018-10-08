@@ -63,6 +63,7 @@ class BaseTest(TestCase):
                 raise Exception("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
                                                                                        cls.config['robot']['client']))
         cls.s3 = cls.s3_controller.s3[cls.s3_service_name]
+        cls.s3.failures.zdb_start_all()
         self.get_s3_info()
 
     @classmethod
@@ -72,13 +73,18 @@ class BaseTest(TestCase):
 
         :return:
         """
-        if not cls.s3_service_name:
-            logger.info("Delete s3 instance")
-            cls.s3_controller.s3.remove()
+        logger.info('Start all zdb')
+        cls.s3.failures.zdb_start_all()
+        pass
 
     def setUp(self):
         self.s3 = self.s3_controller.s3[self.s3_service_name]
         self.get_s3_info()
+        logger.info('Start all zdb')
+        self.s3.failures.zdb_start_all()
+
+    def tearDown(self):
+        pass
 
     def upload_file(self):
         """
