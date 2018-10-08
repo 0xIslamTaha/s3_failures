@@ -27,6 +27,6 @@ class TestS3Failures(BaseTest):
         self.assertEqual(md5_after, md5_before)
 
         self.logger.info(' Start {} zdb'.format((self.parity)))
-        self.s3.failures.zdb_down(count=self.parity)
+        self.s3.failures.zdb_up(count=self.parity)
 
 
