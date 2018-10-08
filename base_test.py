@@ -36,7 +36,7 @@ class BaseTest(TestCase):
                     cls.config['s3']['instance']['shards'], cls.config['s3']['instance']['parity']]
             instance = cls.s3_controller.deploy(s3_service_name, *data)
             logger.info("wait for deploying {} s3 service".format(s3_service_name))
-            instance.wait(die=True)
+            # instance.wait(die=True)
             for _ in range(50):
                 cls.s3 = cls.s3_controller.s3[s3_service_name]
                 state = cls.s3.service.state
@@ -51,14 +51,15 @@ class BaseTest(TestCase):
         else:
             sub = Popen('zrobot godtoken get', stdout=PIPE, stderr=PIPE, shell=True)
             out, err = sub.communicate()
+            import ipdb; ipdb.set_trace()
             god_token = str(out).split(' ')[2]
-            cls.s3_controller = Controller(config, god_token)
-            cls.s3_service_name = config['s3']['use']['s3_service_name']
+            cls.s3_controller = Controller(cls.config, god_token)
+            cls.s3_service_name = cls.config['s3']['use']['s3_service_name']
             if cls.s3_service_name not in cls.s3_controller.s3:
                 logger.error("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
-                                                                                    config['robot']['client']))
+                                                                                    cls.config['robot']['client']))
                 raise Exception("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
-                                                                                       config['robot']['client']))
+                                                                                       cls.config['robot']['client']))
         cls.s3 = cls.s3_controller.s3[cls.s3_service_name]
         self.get_s3_info()
         cls.file_name = self.upload_file()
