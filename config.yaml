@@ -3,18 +3,15 @@ robot:
   client: demo
 
 zerotier:
-  id: af78bf9436630e43
-  token: MyuDhfUYxCkc8eCH8cA4bt4WMgR6saWT
+  id: af78bf9436fae600
+  token: 
 
 s3:
-  deploy: false # True > deploy, false > use
+  deploy: true # True > deploy, false > use
   instance:
     farm: 'tlre'
-    size: 10000
-    shards: 10
+    size: 20000
+    shards: 16
     parity: 4
-    shard_size: 2000
   use:
     s3_service_name: 's3_demo_0'
-
-

@@ -26,17 +26,15 @@ class BaseTest(TestCase):
 
         """
         self = cls()
-        config = j.data.serializer.yaml.load('./config.yaml')
-        if config['s3']['deploy']:
-            cls.s3_controller = Controller(config)
+        cls.config = j.data.serializer.yaml.load('./config.yaml')
+        if cls.config['s3']['deploy']:
+            cls.s3_controller = Controller(cls.config)
             s3_service_name = str(time.time()).split('.')[0]
             logger.info("s3 service name : {}".format(s3_service_name))
 
-            instance = cls.s3_controller.deploy(s3_service_name, config['s3']['instance']['farm'],
-                                                config['s3']['instance']['size'],
-                                                config['s3']['instance']['shards'],
-                                                config['s3']['instance']['parity'],
-                                                config['s3']['instance']['shard_size'])
+            data = [cls.config['s3']['instance']['farm'], cls.config['s3']['instance']['size'],
+                    cls.config['s3']['instance']['shards'], cls.config['s3']['instance']['parity']]
+            instance = cls.s3_controller.deploy(s3_service_name, *data)
             logger.info("wait for deploying {} s3 service".format(s3_service_name))
             instance.wait(die=True)
             for _ in range(50):
@@ -60,7 +58,7 @@ class BaseTest(TestCase):
                 logger.error("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
                                                                                     config['robot']['client']))
                 raise Exception("cant find {} s3 service under {} robot client".format(cls.s3_service_name,
-                                                                                config['robot']['client']))
+                                                                                       config['robot']['client']))
         cls.s3 = cls.s3_controller.s3[cls.s3_service_name]
         self.get_s3_info()
         cls.file_name = self.upload_file()
