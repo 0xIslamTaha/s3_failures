@@ -40,7 +40,7 @@ class BaseTest(TestCase):
                 instance.wait(die=True)
             except:
                 logger.error("May be there is an error while installing s3! ")
-            for _ in range(50):
+            for _ in range(10):
                 cls.s3 = cls.s3_controller.s3[s3_service_name]
                 state = cls.s3.service.state
                 logger.info(" s3 state : {}".format(state))
