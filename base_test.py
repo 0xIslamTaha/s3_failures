@@ -110,13 +110,22 @@ class BaseTest(TestCase):
         if err:
             self.logger.error(err)
 
-        upload_cmd = '/bin/mc cp {} s3Minio/testingbucket/{}'.format(self.file_name, self.file_name)
-        out, err = self.execute_cmd(cmd=upload_cmd)
+        err = self._upload_file('s3Minio', 'testingbucket', self.file_name)
         if err:
-            self.logger.error(err)
+            raise ValueError(err)
 
         self.logger.info(' {} file has been Uploaded'.format(self.file_name))
         return self.file_name
+
+    def _upload_file(self, minio, bucket, file_name):
+        upload_cmd = '/bin/mc cp {} {}/{}/{}'.format(file_name, minio, bucket, file_name)
+        out, err = self.execute_cmd(cmd=upload_cmd)
+        if err:
+            self.logger.error(err)
+            return err
+
+        self.logger.info(' {} file has been Uploaded'.format(self.file_name))
+        return
 
     def download_file(self, file_name):
         """

@@ -64,4 +64,22 @@ class TestS3Failures(BaseTest):
         md5_after = self.download_file(file_name=self.file_name)
         self.assertEqual(md5_after, md5_before)
 
+    def test004_stop_greater_parity_zdb_upload(self):
+        """
+        - Stop n+ zdb, n = parity, should succeed
+        - Upload file, should fail
+        - Start n+ zdb
+        """
+        zdb_turn_down = self.parity + randint(1, self.shards)
+        self.logger.info(' Stop {} zdb'.format(zdb_turn_down))
+        self.s3.failures.zdb_down(count=zdb_turn_down)
 
+        import ipdb; ipdb.set_trace()
+        try:
+            self.file_name = self.upload_file()
+            self.assertTrue(False, 'Uploading should raise an error')
+        except:
+            pass
+
+        self.logger.info(' Start {} zdb'.format(zdb_turn_down))
+        self.s3.failures.zdb_up(count=zdb_turn_down)
