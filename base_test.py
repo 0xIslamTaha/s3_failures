@@ -64,7 +64,6 @@ class BaseTest(TestCase):
                                                                                        cls.config['robot']['client']))
         cls.s3 = cls.s3_controller.s3[cls.s3_service_name]
         self.get_s3_info()
-        cls.file_name = self.upload_file()
 
     @classmethod
     def tearDownClass(cls):
@@ -89,6 +88,7 @@ class BaseTest(TestCase):
          - Upload it
         :return: file_name
         """
+        self.logger.info(' Uploading file ... ')
         with open('%s' % 'random', 'wb') as fout:
             fout.write(os.urandom(1024 * 1024 * 2))  # 1
 
@@ -115,6 +115,7 @@ class BaseTest(TestCase):
         if err:
             self.logger.error(err)
 
+        self.logger.info(' {} file has been Uploaded'.format(self.file_name))
         return self.file_name
 
     def download_file(self, file_name):
