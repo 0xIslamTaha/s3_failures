@@ -15,7 +15,6 @@ class TestS3Failures(BaseTest):
         - assert md5 checksum is matching
         - Start n zdb
         """
-        import ipdb; ipdb.set_trace()
         self.logger.info(' Stop {} zdb'.format((self.parity)))
         md5_before = self.file_name
         self.s3.failures.zdb_down(count=self.parity)

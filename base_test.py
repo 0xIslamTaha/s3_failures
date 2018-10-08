@@ -54,7 +54,6 @@ class BaseTest(TestCase):
         else:
             sub = Popen('zrobot godtoken get', stdout=PIPE, stderr=PIPE, shell=True)
             out, err = sub.communicate()
-            import ipdb; ipdb.set_trace()
             god_token = str(out).split(' ')[2]
             cls.s3_controller = Controller(cls.config, god_token)
             cls.s3_service_name = cls.config['s3']['use']['s3_service_name']
