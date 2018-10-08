@@ -34,9 +34,12 @@ class BaseTest(TestCase):
 
             data = [cls.config['s3']['instance']['farm'], cls.config['s3']['instance']['size'],
                     cls.config['s3']['instance']['shards'], cls.config['s3']['instance']['parity']]
-            #instance = cls.s3_controller.deploy(s3_service_name, *data)
+            instance = cls.s3_controller.deploy(s3_service_name, *data)
             logger.info("wait for deploying {} s3 service".format(s3_service_name))
-            # instance.wait(die=True)
+            try:
+                instance.wait(die=True)
+            except:
+                logger.error("May be there is an error while installing s3! ")
             for _ in range(50):
                 cls.s3 = cls.s3_controller.s3[s3_service_name]
                 state = cls.s3.service.state
