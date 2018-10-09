@@ -73,7 +73,8 @@ class BaseTest(TestCase):
 
         :return:
         """
-        pass
+        self = cls()
+        self._delete_directory(directory='tmp')
 
     def setUp(self):
         self.s3 = self.s3_controller.s3[self.s3_service_name]
@@ -166,6 +167,9 @@ class BaseTest(TestCase):
     def _create_directory(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    def _delete_directory(self, directory):
+        os.rmdir(directory)
 
     def _create_file(self, directory, size):
         with open('/{}/random'.format(directory), 'wb') as fout:
