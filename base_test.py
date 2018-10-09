@@ -73,8 +73,6 @@ class BaseTest(TestCase):
 
         :return:
         """
-        logger.info('Start all zdb')
-        cls.s3.failures.zdb_start_all()
         pass
 
     def setUp(self):
@@ -94,15 +92,11 @@ class BaseTest(TestCase):
          - Upload it
         :return: file_name
         """
-        self.logger.info(' Uploading file ... ')
-        with open('%s' % 'random', 'wb') as fout:
-            fout.write(os.urandom(1024 * 1024 * 2))  # 1
+        self.logger.info(' Uploading file')
 
-        self.file_name = self.calc_md5_checksum('random')
+        self._create_directory(directory='tmp')
+        self.file_name = self._create_file(directory='tmp', size=1024*1024*2)
 
-        os.rename('random', self.file_name)
-
-        self.logger.info('config s3Minio')
         config_minio_cmd = '/bin/mc config host add s3Minio {} {} {}'.format(self.minio['minio_ip'],
                                                                              self.minio['username'],
                                                                              self.minio['password'])
@@ -116,7 +110,8 @@ class BaseTest(TestCase):
         if err:
             self.logger.error(err)
 
-        err = self._upload_file('s3Minio', 'testingbucket', self.file_name)
+        self.logger.info('uploading {} to  testingbucket bucket'.format(self.file_name))
+        err = self._upload_file('s3Minio', 'testingbucket', 'tmp/{}'.format(self.file_name))
         if err:
             raise ValueError(err)
 
@@ -140,11 +135,11 @@ class BaseTest(TestCase):
         :return: str(downloaded_file_md5)
         """
         self.logger.info('downloading {} .... '.format(file_name))
-        upload_cmd = '/bin/mc cp s3Minio/testingbucket/{} {}_out'.format(file_name, file_name)
+        upload_cmd = '/bin/mc cp s3Minio/testingbucket/{} tmp/{}_out'.format(file_name, file_name)
         out, err = self.execute_cmd(cmd=upload_cmd)
         if err:
             self.logger.error(err)
-        return self.calc_md5_checksum('{}_out'.format(file_name))
+        return self.calc_md5_checksum('tmp/{}_out'.format(file_name))
 
     def get_s3_info(self):
         self.s3_data = self.s3.service.data['data']
@@ -167,3 +162,16 @@ class BaseTest(TestCase):
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
+
+    def _create_directory(self, directory):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    def _create_file(self, directory, size):
+        with open('/{}/random'.format(directory), 'wb') as fout:
+            fout.write(os.urandom(size))  # 1
+
+        file_name = self.calc_md5_checksum('random')
+
+        os.rename('/{}/random'.format(directory), file_name)
+        return file_name
